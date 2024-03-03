@@ -32,7 +32,7 @@ It has a constant length of 16 bytes and it's generated pseudo-randomly. It sits
 
 ### Hashing
 
-It is a Merkle–Damgård construction hash with my own one way compression function
+It is based on the Merkle–Damgård construction with my own one way compression function
 
 ![There should be diagram](/img/HSSS_hash.drawio.png)
 

@@ -24,9 +24,11 @@ This algorithm is based on the caesar cipher but the offset of each number is di
 - add that value to the currently encrypted byte (like caesar)
 - shift the password one character to the left (rotate)
 
+Each character being offseted by a different amount greatly reduces the risk of a successful frequency analysis of a ciphertext, even though this is cyclic (cycle has the length of a password), as long as the attacker has no information on the password used.
+
 ### Salt
 
-It has a constant length of 16 bytes and it's generated pseudo-randomly. It sits at the beginning of encrypted data and is appended to the password before hashing.
+It has a constant length of 16 bytes and it's generated pseudo-randomly. It sits at the beginning of encrypted data and is appended to the password before hashing. Salt prevents attacks based on precomputed hash tables such as rainbow tables.
 
 ``[ password ][ salt ]``
 

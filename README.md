@@ -32,13 +32,13 @@ It has a constant length of 16 bytes and it's generated pseudo-randomly. It sits
 
 ### Hashing
 
-It is based on the Merkle–Damgård construction with my own one way compression function
+It is a Merkle–Damgård construction with my own one way compression function
 
 ![There should be diagram](/img/HSSS_hash.drawio.png)
 
 ### One way compression function
 
-It's a function that takes two 8 bit numbers and outputs one. It works as follows, subscripts indicate singular bits:
+It's a function that takes two 8 bit numbers and outputs one, its safety is based on how hard it is to solve higher degree polynomials. It works as follows, subscripts indicate singular bits:
 
 a - input 1  
 b - input 2  
@@ -46,11 +46,17 @@ c - output
 
 c = a<sub>7</sub>b<sup>8</sup> + a<sub>6</sub>b<sup>7</sup> + a<sub>5</sub>b<sup>6</sup> + a<sub>4</sub>b<sup>5</sup> + a<sub>3</sub>b<sup>4</sup> + a<sub>2</sub>b<sup>3</sup> + a<sub>1</sub>b<sup>2</sup> + a<sub>0</sub>b + a + b (mod 256)
 
+The output of previous compression is input a, and the next byte to hash is input b.
+
 ### Encryption
 
 To encrypt one byte of data, you hash salted password and add it modulo 256 to the data byte. After that, you shift the password and go to the next character.  
 
+![There should be diagram](/img/HSSS_encrypt.drawio.png)
+
 Decryption is the same but you subtract the hash.
+
+![There should be diagram](/img/HSSS_decrypt.drawio.png)
 
 ### Shifting
 

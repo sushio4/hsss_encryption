@@ -33,7 +33,7 @@ namespace hsss {
 
         for(auto it = begin; it != end; ++it) {
             uint8_t block = static_cast<uint8_t>(*it);
-            current = compress(current, block) + current;
+            current = compress(current, block);
         }
 
         return current;

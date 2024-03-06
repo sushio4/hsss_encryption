@@ -50,7 +50,8 @@ namespace hsss {
         }
     }
 
-    std::vector<uint8_t> encrypt(const std::vector<uint8_t>& data, std::string password) {
+    template<typename Iter>
+    std::vector<uint8_t> encrypt(Iter begin, Iter end, std::string password) {
         const std::size_t salt_size = 16;
         std::vector<uint8_t> result(salt_size);
         
@@ -63,7 +64,8 @@ namespace hsss {
         //copy salt at the end of the password
         password.insert(password.end(), result.begin(), result.end());
 
-        for(auto msg : data) {
+        for(auto it = begin; it != end; ++it) {
+            auto msg = *it;
             //hash salt shift but it's actually salt hash shift
             uint8_t hashed = hash(password.begin(), password.end());
             
@@ -75,20 +77,22 @@ namespace hsss {
         return result;
     }
 
-    std::vector<uint8_t> decrypt(const std::vector<uint8_t>& data, std::string password) {
+    template<typename Iter>
+    std::vector<uint8_t> decrypt(Iter begin, Iter end, std::string password) {
         const std::size_t salt_size = 16;
         std::vector<uint8_t> result;
-        if(data.size() <= 16) return std::vector<uint8_t>(3,'x');
-        result.reserve(data.size() - salt_size);
+        std::size_t data_size = end - begin;
+        if(data_size <= 16) return std::vector<uint8_t>(3,'x');
+        result.reserve(data_size - salt_size);
         
         password.reserve(password.size() + salt_size);
         
         auto pbegin = password.begin();
         auto pend = password.end();
         //copy salt at the end of the password
-        password.insert(password.end(), data.begin(), data.begin() + salt_size);
+        password.insert(password.end(), begin, begin + salt_size);
 
-        for(auto it = data.begin() + salt_size; it != data.end(); ++it) {
+        for(auto it = begin + salt_size; it != end; ++it) {
             //hash salt shift but it's actually salt hash shift
             uint8_t hashed = hash(password.begin(), password.end());
             

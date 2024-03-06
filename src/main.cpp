@@ -43,11 +43,9 @@ int main(int argc, char* argv[]) {
     //we work on text given as an argument
     if(ap.value('t') != nullptr) {
         std::string text = ap.value('t');
-        std::vector<uint8_t> in;
-        std::vector<uint8_t> out;
+        
         if(encrypt) {
-            in = std::vector<uint8_t>(text.begin(), text.end());
-            out = hsss::encrypt(in, ap.value('e'));
+            std::vector<uint8_t> out = hsss::encrypt(text.begin(), text.end(), ap.value('e'));
             std::cout << "Encrypted data (in hex):\n" << std::hex << std::setfill('0');
             for(auto n : out) {
                 std::cout << std::setw(2) << (uint16_t)n;
@@ -56,12 +54,14 @@ int main(int argc, char* argv[]) {
             return 0;
         }
         //decrypt
+        std::vector<uint8_t> in;
+
         if(!from_hex(text, in)) {
             std::cout << "Invalid (non hex) character!\n";
             return 1;
         }
 
-        out = hsss::decrypt(in, ap.value('d'));
+        std::vector<uint8_t> out = hsss::decrypt(in.begin(), in.end(), ap.value('d'));
         std::cout << "Decrypted data:\n";
         for(auto c : out) {
             std::cout << c;
@@ -105,8 +105,10 @@ int main(int argc, char* argv[]) {
             continue;
         }
 
-        std::vector<uint8_t> in((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        std::vector<uint8_t> out = encrypt ? hsss::encrypt(in, ap.value('e')) : hsss::decrypt(in, ap.value('d'));
+        auto in_begin = std::istreambuf_iterator<char>(file);
+        auto in_end = std::istreambuf_iterator<char>();
+        std::vector<uint8_t> in(in_begin, in_end);
+        std::vector<uint8_t> out = encrypt ? hsss::encrypt(in.begin(), in.end(), ap.value('e')) : hsss::decrypt(in.begin(), in.end(), ap.value('d'));
         file.close();
 
         ofile.write(reinterpret_cast<const char*>(out.data()), out.size());

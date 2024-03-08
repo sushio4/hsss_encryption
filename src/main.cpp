@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <filesystem>
 #include "hsss_lib.hpp"
 #include "ArgParser.hpp"
 #include "Util.hpp"
@@ -13,7 +14,8 @@ constexpr auto args = ArgParser::make_args(
     Arg('v', "version", ArgParser::ArgType::version),
     Arg('t', "text", ArgParser::ArgType::extended),
     Arg('e', "encrypt", ArgParser::ArgType::extended, 1),
-    Arg('d', "decrypt", ArgParser::ArgType::extended, 1)
+    Arg('d', "decrypt", ArgParser::ArgType::extended, 1),
+    Arg('r', "remove")
 );
 
 const char* help_msg = 
@@ -22,6 +24,7 @@ const char* help_msg =
     "Available options:\n"
     " -e --encrypt   encrypts and sets the password\n"
     " -d --decrypt   decrypts and sets the password\n"
+    " -r --remove    removes processed files\n"
     " -t --text      processes text instead of files. For encyrption its plain text, for decryption it should be in hex.\n"
     " -h --help      shows this message\n"
     " -v --version   shows version\n\n"
@@ -105,14 +108,16 @@ int main(int argc, char* argv[]) {
             continue;
         }
 
-        auto in_begin = std::istreambuf_iterator<char>(file);
-        auto in_end = std::istreambuf_iterator<char>();
-        std::vector<uint8_t> in(in_begin, in_end);
-        std::vector<uint8_t> out = encrypt ? hsss::encrypt(in.begin(), in.end(), ap.value('e')) : hsss::decrypt(in.begin(), in.end(), ap.value('d'));
-        file.close();
+        if(encrypt) {
+            hsss::encrypt_stream(file, ap.value('e'), ofile);
+        }
+        else {
+            hsss::decrypt_stream(file, ap.value('d'), ofile);
+        }
 
-        ofile.write(reinterpret_cast<const char*>(out.data()), out.size());
-        ofile.close();
+        if(ap.set('r') && filename != ofilename) {
+            std::remove(filename);
+        }
 
         std::cout << "File " << filename << " successfully " << (encrypt ? "encrypted" : "decrypted") << " to " << ofilename << '\n';
     }

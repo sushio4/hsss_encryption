@@ -103,4 +103,22 @@ namespace hsss {
 
         return result;
     }
+
+    void encrypt_stream(std::istream& file, std::string password, std::ostream& ofile) {
+        auto in_begin = std::istreambuf_iterator<char>(file);
+        auto in_end = std::istreambuf_iterator<char>();
+        std::vector<uint8_t> in(in_begin, in_end);
+        std::vector<uint8_t> out = hsss::encrypt(in.begin(), in.end(), password);
+
+        ofile.write(reinterpret_cast<const char*>(out.data()), out.size());
+    }
+
+    void decrypt_stream(std::istream& file, std::string password, std::ostream& ofile) {
+        auto in_begin = std::istreambuf_iterator<char>(file);
+        auto in_end = std::istreambuf_iterator<char>();
+        std::vector<uint8_t> in(in_begin, in_end);
+        std::vector<uint8_t> out = hsss::decrypt(in.begin(), in.end(), password);
+
+        ofile.write(reinterpret_cast<const char*>(out.data()), out.size());
+    }
 };
